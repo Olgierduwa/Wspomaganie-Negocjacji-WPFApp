@@ -1,0 +1,136 @@
+﻿<Page x:Class="negocjacja.Strony.UzupelnienieDanych"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:negocjacja.Strony"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="1300" FontSize="26"
+      Title="UzupelnienieDanych">
+
+    <Page.Resources>
+        <local:NameToSliderVisibilityConverter x:Key="WidzialnoscSlideraKwestii" NazwaSzukana="Nowa kwestia..."/>
+        <local:NameToSliderVisibilityConverter x:Key="WidzialnoscSlideraOpcji" NazwaSzukana="Nowa opcja..."/>
+    </Page.Resources>
+
+    <DockPanel>
+        <Grid DockPanel.Dock="Bottom" HorizontalAlignment="Right">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Background="Coral" FontSize="20" Name="Zaspis" Click="Zapisz" Margin="0,0,20,20" Width="100" Grid.Column="0" Content="ZAPISZ">
+                <Button.ToolTip>Zapisz aktualny stan Kwestii i Opcji do pliku tekstowego</Button.ToolTip> </Button>
+            <Button Background="Coral" FontSize="20" Name="Odczyt" Click="Wczytaj" Margin="0,0,20,20" Width="100" Grid.Column="1" Content="WCZYTAJ">
+                <Button.ToolTip>Wczytaj plik tekstowy z zapisanymi wcześniej Kwestiami i Opcjami</Button.ToolTip>
+            </Button>
+            <Button Background="Coral" FontSize="20" Name="SuwakiSkala" Click="UstawSkale" Margin="0,0,20,20" Width="100" Grid.Column="2" Content="SKALA: 10">
+                <Button.ToolTip>Zmień skalę na suwakach na 10-cio lub 20-to stopniową</Button.ToolTip>
+            </Button>
+            <Button Background="Coral" FontSize="20" Name="SuwakiButton" Click="UstawSuwaki" Margin="0,0,20,20" Width="100" Grid.Column="3" Content="SUWAKI">
+                <Button.ToolTip>Ustaw domyślne wartości suwaków dla wszystkich Kwestii i Opcji</Button.ToolTip>
+            </Button>
+            <Button Background="Coral" FontSize="20" Name="WyczyscButton" Click="WyczyscKwestie" Margin="0,0,20,20" Width="100" Grid.Column="4" Content="WYCZYŚĆ">
+                <Button.ToolTip>Wyczyść wszystkie wprowadzone dane</Button.ToolTip>
+            </Button>
+            <Button Background="Coral" FontSize="20" Name="SprawdzButton" Click="SprawdzPoprawnosc" Margin="0,0,20,20" Width="100" IsEnabled="False" Grid.Column="5" Content="SPRAWDZ">
+                <Button.ToolTip>Sprawdź poprawność wprowadzonych danych</Button.ToolTip>
+            </Button>
+            <Button Background="Coral" FontSize="20" Name="DalejButton" Click="PrzyciskNegocjacji" Margin="0,0,20,20" Width="100" IsEnabled="False" Grid.Column="6" Content="DALEJ">
+                <Button.ToolTip>Przejdź do negocjacji</Button.ToolTip>
+            </Button>
+
+        </Grid>
+        <Grid DockPanel.Dock="Top" Margin="20" DataContext="{Binding ElementName=Kwestie, Path=SelectedItem}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition />
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Content="KWESTIE ISTOTNE W NEGOCJACJACH" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+            <Label Content="OPCJE DLA DANEJ KWESTII" Grid.Column="2" HorizontalAlignment="Center" Margin="0,0,0,20" Name="OpcjeLabel" Visibility="Hidden"/>
+
+            <ListBox Grid.Row="3" Name="KwestieLista" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" Visibility="Hidden">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True" >
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox KeyDown="KwestiaKlikKlawisz" GotFocus="KwestiaGotFocus" BorderBrush="Coral"
+                                     Tag="{Binding Path=ID}" Text="{Binding Path=Nazwa}" Background="{Binding Path=Kolor}">
+                                <TextBox.ToolTip>Edytuj wybraną Kwestię negocjacyjną</TextBox.ToolTip>
+                            </TextBox>
+                            <Slider Grid.Column="1" Foreground="Black" Background="Coral" Maximum="100" TickFrequency="{Binding Path=Skala}" TickPlacement="BottomRight"
+                                    IsSnapToTickEnabled="True" Margin="8" ValueChanged="AktualizacjaSuwaka"
+                                    Visibility="{Binding Path=Nazwa, Converter={StaticResource WidzialnoscSlideraKwestii}}" Tag="{Binding Path=ID}" Value="{Binding Path=Waga}">
+                                <Slider.ToolTip>Zmień ważność wybranej Kwestii względem pozostałych</Slider.ToolTip></Slider>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBox Grid.Row="1" VerticalAlignment="Top" Name="NowaKwestiaTextBox" Foreground="DimGray" Background="Coral"
+                     KeyDown="NowaKwestiaKlikKlawisz" GotFocus="NowaKwestiaGotFocus" LostFocus="NowaKwestiaLostFocus" Text="Nowa kwestia...">
+                <TextBox.ToolTip>Dodaj nową Kwestię negocjacyjną</TextBox.ToolTip>
+            </TextBox>
+
+            <ListBox Grid.Row="3" Grid.Column="2" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" Name="OpcjeLista" Visibility="Hidden">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True" >
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox KeyDown="OpcjaKlikKlawisz" GotFocus="OpcjaGotFocus" Tag="{Binding Path=ID}" Text="{Binding Path=Nazwa}" BorderBrush="Coral" >
+                                <TextBox.ToolTip>Edytuj wybraną Opcję negocjacyjną</TextBox.ToolTip></TextBox>
+                            <Slider Grid.Column="1" Foreground="Black" Background="Coral" Maximum="100" TickFrequency="{Binding Path=Skala}" TickPlacement="BottomRight"
+                                    IsSnapToTickEnabled="True" Margin="8" ValueChanged="AktualizacjaSuwaka"
+                                    Visibility="{Binding Path=Nazwa, Converter={StaticResource WidzialnoscSlideraOpcji}}" Tag="{Binding Path=ID}" Value="{Binding Path=Waga}">
+                                <Slider.ToolTip>Zmień ważność wybranej Opcji względem pozostałych</Slider.ToolTip>
+                            </Slider>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBox Grid.Row="1" Grid.Column="2" VerticalAlignment="Top" Name="NowaOpcjaTextBox" Foreground="DimGray" Background="Coral" Visibility="Hidden"
+                     KeyDown="NowaOpcjaKlikKlawisz" GotFocus="NowaOpcjaGotFocus" LostFocus="NowaOpcjaLostFocus" Text="Nowa opcja...">
+                <TextBox.ToolTip>Dodaj nową Opcję negocjacyjną</TextBox.ToolTip></TextBox>
+
+        </Grid>
+    </DockPanel>
+</Page>
