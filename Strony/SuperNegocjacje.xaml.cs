@@ -164,7 +164,17 @@ namespace negocjacja.Strony
 
         private void Autor(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Olgierd Kuczyński ©2021 \n", "Autor Negocjatora4200");
+            string sMessageBoxText = "\t  Olgierd Kuczyński ©2021 \n\nhttps://github.com/Olgierduwa/negocjator4200\n\n       Otworzyć repozytorium w przeglądarce?";
+            string sCaption = "Autor Negocjatora4200";
+
+            MessageBoxButton btnMessageBox = MessageBoxButton.OKCancel;
+            MessageBoxImage icnMessageBox = MessageBoxImage.Information;
+
+            MessageBoxResult rezultat = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
+            if (rezultat == MessageBoxResult.OK)
+            {
+                System.Diagnostics.Process.Start("https://github.com/Olgierduwa/negocjator4200");
+            }
         }
     }
 }
